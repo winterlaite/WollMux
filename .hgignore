@@ -1,7 +1,10 @@
 syntax: glob
 localization.conf
 localizedConfigStrings.conf
+oxt/description.xml
 oxt/WollMux.rdb
+misc/buildinfo
+misc/version
 idl/de/muenchen/allg/itd51/wollmux/*.urd
 idl/de/muenchen/allg/itd51/wollmux/*.class
 bin/de
