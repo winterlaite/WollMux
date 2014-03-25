@@ -331,7 +331,6 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		-->
 
 		<apply verbose="true" executable="${OOO_SDK}/bin/javamaker" relative="true" addsourcefile="false" dest="${BIN}">
-			<arg line="-BUCR" />
 			<targetfile />
 
 			<!-- ATTENTION! The ./ before the ${MY_IDL} is important or javamaker fails with
