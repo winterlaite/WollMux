@@ -152,7 +152,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 	<echo message="===== Using bootstrap files from ${TOOLING} =====" />
 
 
-	<target name="all" depends="debug,WollMuxBar.jar,WollMux.oxt,md5sum" />
+	<target name="all" depends="debug, WollMux.oxt, wollmuxbar, md5sum"/>
 	
 	<target name="snapshot" depends="clean, makechangelog, debug, all, .tar.gz, deb, wininstaller, WollMuxInterfaces.jar, documentation" />
 
@@ -520,12 +520,12 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		<java classname="de.muenchen.allg.itd51.wollmux.LocalizationUpdater" fork="true" classpath="${MY_CLASSES}" dir="${basedir}"/>
 	</target>
 
-	<target name="wollmuxbar">
+	<target name="wollmuxbar" depends="WollMuxBar.jar">
 		<copy todir="${PACKAGE_DIR}" file="${MISC}/wollmuxbar" />
 	</target>
 
 	<!-- Das Target erzeugt die wollmuxbar.exe -->
-	<target name="wollmuxbar.exe">
+	<target name="wollmuxbar.exe" depends="WollMuxBar.jar">
 		<exec executable="makensis" failonerror="true" failifexecutionfails="true">
 			<arg line="-V3 -DOUT_FILE=${WOLLMUXBAR_EXE_NAME} -DJAR_FILE=${WOLLMUXBAR_JAR_NAME} ${MISC}/wollmuxbarlauncher.nsi"/>
 		</exec>
