@@ -15,6 +15,10 @@ debug: List this target before other build targets to get .class files with
 all: Create the OOo component and WollMuxBar.jar, but *not* the Debian package.
      The files are created in the dist/ directory.
 
+wollmuxbar: Provides WollMux Bar executable for UNIX.
+
+wollmuxbar.exe: Provides WollMux Bar executable for Windows.
+
 .tar.gz: Creates wollmux-<version>.tar.gz with the WollMux and UNOHelper sources
 
 deb: Create the Debian package in the dist/ directory. 
@@ -24,7 +28,7 @@ deb: Create the Debian package in the dist/ directory.
      it will be used. Otherwise the lhmdeb directory is used, which only works for
      the Landeshauptstadt München's Basisclient.
 
-wininstaller : Creates the Windows installer executable in the dist/ directory.
+wininstaller: Creates the Windows installer executable in the dist/ directory.
 
 install: Install the WollMux OOo component in the user area for the user running ant.
          DO NOT USE THIS AS ROOT. IT DOESN'T DO SYSTEM-WIDE INSTALLATION.
@@ -419,7 +423,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		</jar>
 	</target>
 
-    <target name="WollMux.oxt" depends="WollMux.uno.jar, makeversion">
+	<target name="WollMux.oxt" depends="WollMux.uno.jar, makeversion">
 		<delete file="${PKG_FILE}" />
 		<zip destfile="${PKG_FILE}">
 			<fileset file="${WollMux_COMPJAR}" />
@@ -457,7 +461,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		<echo level="info" message="Install finished at ">${mytime}</echo>
 	</target>
 
-	<target name=".tar.gz" depends="makeversion, bumpversion">
+	<target name=".tar.gz" depends="makeversion, bumpversion, wollmuxbar">
 		<property name="TAR_BUILD_DIR" value="${PACKAGE_DIR}/wollmux-${VERSION}" />
 		<mkdir dir="${TAR_BUILD_DIR}" />
 		<copy todir="${TAR_BUILD_DIR}/WollMux" >
@@ -480,7 +484,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		<delete dir="${TAR_BUILD_DIR}" />
 	</target>
 	
-	<target name="deb" depends="makeversion, bumpversion">
+	<target name="deb" depends="makeversion, bumpversion, wollmuxbar">
 		<property name="DEB_BUILD_DIR" value="${PACKAGE_DIR}/deb/wollmux-${VERSION}" />
 		<condition property="DEBIAN_DIR" value="debian" else="lhmdeb">
 			<available file="debian/rules" />
@@ -518,6 +522,10 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 	<!-- Das Target aktualisiert das LocalizationConf-File -->
 	<target name="updateLocalizationConf">
 		<java classname="de.muenchen.allg.itd51.wollmux.LocalizationUpdater" fork="true" classpath="${MY_CLASSES}" dir="${basedir}"/>
+	</target>
+
+	<target name="wollmuxbar">
+		<copy todir="${PACKAGE_DIR}" file="${MISC}/wollmuxbar" />
 	</target>
 
 	<!-- Das Target erzeugt die wollmuxbar.exe -->
