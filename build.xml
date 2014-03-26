@@ -167,20 +167,15 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 	
 	<target name="clean" >
 		<delete includeEmptyDirs="true">
-		<fileset dir="${MY_IDL}" includes="**/*.urd" />
+			<fileset dir="${MY_IDL}" includes="**/*.urd" />
 			<fileset dir="${MY_IDL}" includes="**/*.class" />
 			<fileset dir="${BIN}" includes="de/**" />
 			<fileset dir="${BIN}" includes="com/**" />
 			<fileset dir="${BIN}" includes="data/**" />
-			
+
 			<fileset file="${RDBFILE}" />
-			<fileset file="${MD5SUMS_FILE_NAME}"/>
 			<fileset file="${WollMux_COMPJAR}" />
-			<fileset file="${WOLLMUXBAR_JAR}" />
-			<fileset file="${TERMINATEOOO_JAR}" />
-			<fileset dir="${PACKAGE_DIR}" includes="*-installer.exe" />
-			<!-- <fileset file="${WOLLMUXBAR_EXE}" /> -->
-			<fileset file="${PKG_FILE}" />
+			<fileset dir="${PACKAGE_DIR}" />
 
 			<!-- VERSION_FILE, BUILD_INFO_FILE und DESCRIPTION_XML 
 			    **nicht** löschen, da diese nur bei
@@ -193,13 +188,14 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 			generiert werden kann. -->
 			<!-- <fileset file="${CHANGELOG_FILE}" /> -->
 
-			<!-- UPDATE_XML schon löschen, da diese extern eh nicht benötigt wird -->
-			<fileset file="${UPDATE_XML}" />
-			<fileset file="${PACKAGE_DIR}/wollmux-*.tar.gz" />
 		</delete>
 		<delete dir="${PACKAGE_DIR}/deb" />
 	</target>
-	
+
+	<target name="package_dir">
+		<mkdir dir="${PACKAGE_DIR}" />
+	</target>
+
 	<target name="makeversion" depends="makeversion_unix, makeversion_windows">
 		<loadfile property="VERSION" srcfile="${VERSION_FILE}" failonerror="true">
 			<filterchain>
@@ -244,7 +240,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		</exec>		
 	</target>
 
-	<target name="documentation">
+	<target name="documentation" depends="package_dir">
 		<!-- Download all pages belonging to the WollMux manual category --> 
 		<get dest="${DOC_DIR}">
 			<resourcelist>
@@ -378,7 +374,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		/>
 	</target>
 	
-	<target name="WollMuxBar.jar" depends="makeversion, compile">
+	<target name="WollMuxBar.jar" depends="makeversion, compile, package_dir">
 		<delete file="${WOLLMUXBAR_JAR}" />
 		<jar destfile="${WOLLMUXBAR_JAR}" duplicate="preserve">
 <!--			<fileset dir="${BIN}" includes="**/WollMuxBar*,**/dialog/UIElement*,**/ConfigThingy*,**/NodeNotFoundException*,**/SyntaxErrorException*,**/ConfigurationErrorException*,**/DispatchHandler*,**/L.class,**/Logger*,**/WollMuxFiles*,**/WollMuxBarEventHandler*,**/dialog/Common*,**/XPAL*,**/XWollMux*" />
@@ -423,7 +419,7 @@ snapshot: Create all files for a WollMux-Snapshot. LHM-internal use only.
 		</jar>
 	</target>
 
-	<target name="WollMux.oxt" depends="WollMux.uno.jar, makeversion">
+	<target name="WollMux.oxt" depends="WollMux.uno.jar, makeversion, package_dir">
 		<delete file="${PKG_FILE}" />
 		<zip destfile="${PKG_FILE}">
 			<fileset file="${WollMux_COMPJAR}" />
