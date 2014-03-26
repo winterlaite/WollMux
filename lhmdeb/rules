@@ -14,6 +14,7 @@ include /usr/share/cdbs/1/class/ant.mk
 
 JAVA_HOME := /usr/lib/jvm/default-java
 ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ANT_ARGS += -DUNOHELPER_DIR=UNOHelper
 
 # Debian SDK path
 #export PATH := $(PATH):/usr/lib/openoffice/basis3.0/sdk/bin
