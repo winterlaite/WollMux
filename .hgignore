@@ -24,7 +24,7 @@ dist/WollMuxInterfaces.jar
 dist/md5sums.txt
 dist/WollMux.update.xml
 dist/TerminateOOo.jar
-dist/wollmux-*-installer.exe
+dist/WollMux-*-installer.exe
 dist/wollmux-*.tar.gz
 oxt/WollMux.uno.jar
 *~
