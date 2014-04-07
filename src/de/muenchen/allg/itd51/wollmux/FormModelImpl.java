@@ -26,6 +26,7 @@
  * 28.04.2008 | BNK | [R19466]+save(), +saveAs()
  * 02.06.2010 | BED | +saveTempAndOpenExt
  * 01.04.2014 | JGM | Anpassungen an startFormGUI für SingleDocumentFormModel
+ * 04.04.2014 | JGM | Überarbeitetung, Anpassungen an startFormGUI für SingleDocumentFormModel
  * -------------------------------------------------------------------
  *
  * @author Christoph Lutz (D-III-ITD 5.1)
@@ -58,21 +59,16 @@ import de.muenchen.allg.itd51.wollmux.func.FunctionLibrary;
  * Formularbestandteile eines Dokuments.
  */
 public class FormModelImpl
-{
+{	  
   /**
-  *  formTitles beinhaltet die Title der z.Z. ausgeführten FormGUIs
-  */
-  public static Vector<String> formTitles=new Vector<String>();
-
-  /**
-  * wTitles beinhaltet die "window title" der Dokumente der z.Z. ausgeführten FormGUIs
-  */
-  public static Vector<String> wTitles=new Vector<String>();
-	  
-  /**
-  * vFormGUIs beinhaltet die Referenzen der z.z. ausgeführten FormGUIs
+  * vFormGUIs beinhaltet die Referenzen der z.Z. ausgeführten FormGUIs
   */
   public static Vector<FormGUI> vFormGUIs=new Vector<FormGUI>();
+  
+  /**
+  * vFrames beinhaltet die Referenzen der z.Z. ausgeführten Frames mit FormGUI
+  */
+  public static Vector<XFrame> vFrames=new Vector<XFrame>();
 
   public static final String MULTI_FORM_TITLE =
     L.m("Mehrere Formulare gleichzeitig ausfüllen");
@@ -866,53 +862,18 @@ public class FormModelImpl
      */
     public void startFormGUI()
     {
-  	  boolean containsTitles=false;
-      String wTitle=doc.getFormModel().getWindowTitle();
-      String fTitle=null;
-      try
-      {
-        fTitle = formConf.get("TITLE").toString();
+      boolean containsFrames=false;
+      containsFrames=vFrames.contains(doc.getFrame());
 
-      if (wTitle.contains(":")){
-        wTitle=wTitle.substring(0, wTitle.indexOf(":")-1);
-      }
-      containsTitles=(formTitles.contains(fTitle))&&wTitles.contains(wTitle);
-      
-      }
-      catch (NodeNotFoundException x)
-      {
-        Logger.error(L.m("Fenstertietel nicht gefunden. (siehe: Formular-Knoten, der die Formularbeschreibung enthält)"), x);
-      }
+      //Schaue ob bereits eine Instanz genau dieses Formulars geöffnet ist, falls ja wird das nun ungültige FormGUI beendet 
+      if (containsFrames){  
+        //Hole Index des ungültigen FormGUI
+        int frameIndex=vFrames.indexOf(doc.getFrame());
         
-      if (containsTitles){
-        // int foundIndex = -1;
-        int windex = 0;
-        int findex = 0;
-        int tmpIndexSum = 0;
-        //Schaue ob bereits eine Instanz genau dieses Formulars geöffnet ist, falls ja wird das nun ungültige FormGUI beendet 
-        while (true) {
-          if (formTitles.indexOf(fTitle, findex) == wTitles.indexOf(wTitle, windex)) {
-            // ungültiges FormGUI beenden und Titel sowie Refenrenz aus Klassenvariable entfernen
-            vFormGUIs.get(wTitles.indexOf(wTitle)).dispose();
-            formTitles.remove(wTitles.indexOf(wTitle));
-            vFormGUIs.remove(wTitles.indexOf(wTitle));
-            wTitles.remove(wTitles.indexOf(wTitle));
-            break;
-          } else if (formTitles.indexOf(fTitle, findex) > wTitles.indexOf(wTitle,windex)) {
-            windex = formTitles.indexOf(fTitle, findex);
-            System.out.println("hindex größer " + findex);
-
-          } else {
-            findex = wTitles.indexOf(wTitle, windex);
-            System.out.println("lindex größer " + findex);
-          }
-          if (tmpIndexSum == windex + findex) {
-            // es existiert noch keine FormGUI instanz für dieses Dokument
-            break;
-          } else {
-            tmpIndexSum = windex + findex;
-          }
-        }
+        vFormGUIs.get(frameIndex).dispose();
+        vFormGUIs.remove(frameIndex);
+        vFrames.remove(frameIndex);
+        Logger.debug(L.m("FormGUI an der Stelle %1 beendet.", frameIndex));
       }
       
       HashMap<String, String> idToPresetValue = doc.getIDToPresetValue();
@@ -920,10 +881,9 @@ public class FormModelImpl
         new FormGUI(formFensterConf, formConf, this, idToPresetValue,
           functionContext, funcLib, dialogLib, visible);
       
-      // füge FormGUI Refenrenz und die Titel zu den Klassenvariable hinzu
-      formTitles.add(fTitle);
-      wTitles.add(wTitle);
+      // füge FormGUI Refenrenz und die dazugehörigen Frames zu den Klassenvariable hinzu
       vFormGUIs.add(formGUI);
+      vFrames.add(doc.getFrame());  
     }
 
     public String getWindowTitle()
