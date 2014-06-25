@@ -3,7 +3,7 @@
 # This is the Nullsoft Scriptable Install System (NSIS) script for generating
 # the WollMux Installer for Windows.
 # 
-# Copyright (c) 2011 Landeshauptstadt München
+# Copyright (c) 2011 Landeshauptstadt Mï¿½nchen
 # Author: Daniel Benkmann
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@
 Name "${WOLLMUX} ${VERSION}"
 OutFile "${WOLLMUX}-${VERSION}-installer.exe"
 Caption "${WOLLMUX} Installer"
-BrandingText "(c) Landeshauptstadt München" ;; string to replace "Nullsoft Install System vX.XX" at the bottom of install window
+BrandingText "(c) Landeshauptstadt Mï¿½nchen" ;; string to replace "Nullsoft Install System vX.XX" at the bottom of install window
 
 RequestExecutionLevel admin ;; needed to set ExecutionLevel for Vista/Windows 7 - works only with NSIS ver. 2.21+
 AllowRootDirInstall true ;; not necessary but why restrict the user?
@@ -68,7 +68,7 @@ ShowUninstDetails hide
 InstallDir "$PROGRAMFILES\${WOLLMUX}" ;; default ($INSTDIR will be overwritten in .onInit function if "--INSTDIR=" command line parameter is set)
 
 # Installer & Uninstaller Pages
-Page components ;; Soll der User überhaupt was auswählen dürfen?
+Page components ;; Soll der User ï¿½berhaupt was auswï¿½hlen dï¿½rfen?
 Page directory
 Page instfiles
 UninstPage uninstConfirm
@@ -379,8 +379,10 @@ Function ${UN}GetOOoPath
 	# It looks in:
 	#  1 - the registry value "" (default) of the key "HKCU\Software\OpenOffice.org\UNO\InstallPath"
 	#  2 - the registry value "" (default) of the key "HKLM\Software\OpenOffice.org\UNO\InstallPath"
-	#  3 - the registry value "" (default) of the key "HKCU\Software\LibreOffice\UNO\InstallPath"
-	#  4 - the registry value "" (default) of the key "HKLM\Software\LibreOffice\UNO\InstallPath"
+	#  3 - the registry value "" (default) of the key "HKCU\Software\OpenOffice\UNO\InstallPath"
+	#  4 - the registry value "" (default) of the key "HKLM\Software\OpenOffice\UNO\InstallPath"
+	#  5 - the registry value "" (default) of the key "HKCU\Software\LibreOffice\UNO\InstallPath"
+	#  6 - the registry value "" (default) of the key "HKLM\Software\LibreOffice\UNO\InstallPath"
 	#
 	# If the path could not be found the string "NOTFOUND" is returned.
 	# If the command line parameter "--LIBRE" is set we skip the search in 1) and 2).
@@ -407,20 +409,34 @@ Function ${UN}GetOOoPath
 	StrCmp $R0 "" +2  ;; check if entry is empty
 	IfFileExists $R0\*.* OOoFound  ;; 2) found path in the HKLM OOo registry key
 	StrCpy $R0 "NOTFOUND"
-	
+
+	ClearErrors
+	ReadRegStr $R0 HKCU "Software\OpenOffice\UNO\InstallPath" ""
+	IfErrors +3
+	StrCmp $R0 "" +2  ;; check if entry is empty
+	IfFileExists $R0\*.* OOoFound  ;; 3) found path in the HKCU AOO registry key
+	StrCpy $R0 "NOTFOUND"
+
+	ClearErrors
+	ReadRegStr $R0 HKLM "Software\OpenOffice\UNO\InstallPath" ""
+	IfErrors +3
+	StrCmp $R0 "" +2  ;; check if entry is empty
+	IfFileExists $R0\*.* OOoFound  ;; 4) found path in the HKLM AOO registry key
+	StrCpy $R0 "NOTFOUND"
+
   skipOOoReg:
 	ClearErrors
 	ReadRegStr $R0 HKCU "Software\LibreOffice\UNO\InstallPath" ""
 	IfErrors +3
 	StrCmp $R0 "" +2  ;; check if entry is empty
-	IfFileExists $R0\*.* OOoFound  ;; 3) found path in the HKCU LibreOffice registry key
+	IfFileExists $R0\*.* OOoFound  ;; 5) found path in the HKCU LibreOffice registry key
 	StrCpy $R0 "NOTFOUND"
 
 	ClearErrors
 	ReadRegStr $R0 HKLM "Software\LibreOffice\UNO\InstallPath" ""
 	IfErrors +3
 	StrCmp $R0 "" +2  ;; check if entry is empty
-	IfFileExists $R0\*.* OOoFound  ;; 4) found path in the HKLM LibreOffice registry key
+	IfFileExists $R0\*.* OOoFound  ;; 6) found path in the HKLM LibreOffice registry key
 	StrCpy $R0 "NOTFOUND"
  
   OOoFound:
